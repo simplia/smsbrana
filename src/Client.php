@@ -90,18 +90,6 @@ class Client {
     }
 
     /*
-     * Erase login attributes out of class variables
-     *
-     * @return true
-     */
-    public function logout() {
-        $this->login = null;
-        $this->password = null;
-        $this->queue = null;
-        return true;
-    }
-
-    /*
      * Try to output xml if $data in xml format, or else output raw $data
      *
      * @param String $data content of some URL
@@ -192,19 +180,15 @@ class Client {
      */
     public function sendAllSMS() {
         $dataArray = $this->getAuthData();
-        if(!empty($dataArray)) {
-            if(!$this->queue->count())
-                return false;
+        if(!$this->queue->count()) {
+            return false;
+        }
+        $dataArray['action'] = 'xml_queue';
 
-            $dataArray['action'] = 'xml_queue';
-
-
-            return $this->getAnswer((string)$this->httpClient->post($this->apiScript, [
-                'query' => $dataArray,
-                'xml' => $this->queue->asXML(),
-            ])->getBody());
-        } else
-            return $this->getLoginError();
+        return $this->getAnswer((string)$this->httpClient->post($this->apiScript, [
+            'query' => $dataArray,
+            'xml' => $this->queue->asXML(),
+        ])->getBody());
     }
 
     protected function xmlEncode($string) {
