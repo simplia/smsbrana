@@ -128,7 +128,7 @@ class Client {
      * @param String $sender phone number of sender
      * @param String $delivery delivery report?
      *
-     * @return String response body of the target page
+     * @return array
      */
     public function send($number, $message, $time = "", $sender = "", $delivery = "") {
         $dataArray = $this->getAuthData();
@@ -140,13 +140,16 @@ class Client {
         $dataArray['sender_id'] = $sender;
         $dataArray['delivery_report'] = $delivery;
 
-        $response = $this->getAnswer((string)$this->httpClient->get($this->apiScript, [
+        $response = new \SimpleXMLElement($this->getAnswer((string)$this->httpClient->get($this->apiScript, [
             'query' => $dataArray,
-        ])->getBody());
-        if($response['err'] > 0) {
-            throw new IOException('Sending error ' . $response['err']);
+        ])->getBody()));
+        if((int)$response->err > 0) {
+            throw new IOException('Sending error ' . (int)$response->err);
         }
-        return (string)$response->sms_id;
+        return [
+            'id' => (string)$response->sms_id,
+            'count' => (int)$response->sms_count,
+        ];
     }
 
     /*
