@@ -1,6 +1,4 @@
 <?php
-
-
 namespace Simplia\SmsBrana;
 
 
@@ -25,11 +23,17 @@ class Client {
 
     protected $httpClient;
 
-    function __construct(\GuzzleHttp\Client $client, $login, $password, $authType) {
+    /**
+     * Client constructor.
+     * @param \GuzzleHttp\Client $client
+     * @param string $loginOrHash
+     * @param string|null $password
+     */
+    function __construct(\GuzzleHttp\Client $client, $loginOrHash, $password = null) {
         $this->httpClient = $client;
-        $this->login = $login;
+        $this->login = $loginOrHash;
         $this->password = $password;
-        $this->authType = $authType;
+        $this->authType = empty($password) ? self::AUTH_HASH : self::AUTH_PLAIN;
         $this->create();
     }
 
