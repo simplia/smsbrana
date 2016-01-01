@@ -70,7 +70,7 @@ class Client {
      */
     private function getAuthData() {
         if(empty($this->login) || empty($this->password))
-            return null;
+            throw new IOException('Missing auth parameters');
         else {
             $resultArray = array();
             if($this->authType == self::AUTH_PLAIN) {
@@ -118,30 +118,17 @@ class Client {
     }
 
     /*
-     * Get the same error as the server's to invalid login or password
-     *
-     * @return String in xml format
-     *
-     */
-    private function getLoginError() {
-        return $this->getAnswer("<?xml version=\"1.0\" encoding=\"utf-8\"?><result><err>2</err></result>");
-    }
-
-    /*
      * Get inbox SMS
      *
      * @return String response body of the target page
      */
     public function inbox() {
         $dataArray = $this->getAuthData();
-        if(!empty($dataArray)) {
-            $dataArray['action'] = 'inbox';
+        $dataArray['action'] = 'inbox';
 
-            return $this->getAnswer((string)$this->httpClient->get($this->apiScript, [
-                'query' => array_merge($dataArray, ['delete' => 1])
-            ])->getBody());
-        } else
-            return $this->getLoginError();
+        return $this->getAnswer((string)$this->httpClient->get($this->apiScript, [
+            'query' => array_merge($dataArray, ['delete' => 1])
+        ])->getBody());
     }
 
     /*
@@ -155,21 +142,19 @@ class Client {
      *
      * @return String response body of the target page
      */
-    public function send_SMS($number, $message, $time = "", $sender = "", $delivery = "") {
+    public function send($number, $message, $time = "", $sender = "", $delivery = "") {
         $dataArray = $this->getAuthData();
-        if(!empty($dataArray)) {
-            $dataArray['action'] = 'send_sms';
-            $dataArray['number'] = $number;
-            $dataArray['message'] = $message;
-            $dataArray['when'] = $time;
-            $dataArray['sender_id'] = $sender;
-            $dataArray['delivery_report'] = $delivery;
 
-            return $this->getAnswer((string)$this->httpClient->get($this->apiScript, [
-                'query' => $dataArray,
-            ])->getBody());
-        } else
-            return $this->getLoginError();
+        $dataArray['action'] = 'send_sms';
+        $dataArray['number'] = $number;
+        $dataArray['message'] = $message;
+        $dataArray['when'] = $time;
+        $dataArray['sender_id'] = $sender;
+        $dataArray['delivery_report'] = $delivery;
+
+        return (string)$this->getAnswer((string)$this->httpClient->get($this->apiScript, [
+            'query' => $dataArray,
+        ])->getBody())->sms_id;
     }
 
     /*
