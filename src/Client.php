@@ -152,9 +152,13 @@ class Client {
         $dataArray['sender_id'] = $sender;
         $dataArray['delivery_report'] = $delivery;
 
-        return (string)$this->getAnswer((string)$this->httpClient->get($this->apiScript, [
+        $response = $this->getAnswer((string)$this->httpClient->get($this->apiScript, [
             'query' => $dataArray,
-        ])->getBody())->sms_id;
+        ])->getBody());
+        if($response['err'] > 0) {
+            throw new IOException('Sending error ' . $response['err']);
+        }
+        return (string)$response->sms_id;
     }
 
     /*
