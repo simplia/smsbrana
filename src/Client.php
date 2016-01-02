@@ -108,15 +108,27 @@ class Client {
     /*
      * Get inbox SMS
      *
-     * @return String response body of the target page
+     * @return Message[]
      */
-    public function inbox() {
+    public function inbox($delete = true) {
         $dataArray = $this->getAuthData();
         $dataArray['action'] = 'inbox';
 
-        return $this->getAnswer((string)$this->httpClient->get($this->apiScript, [
-            'query' => array_merge($dataArray, ['delete' => 1])
-        ])->getBody());
+        $response = new \SimpleXMLElement($this->getAnswer((string)$this->httpClient->get($this->apiScript, [
+            'query' => array_merge($dataArray, ['delete' => $delete ? 1 : 0])
+        ])->getBody()));
+        if((int)$response->err > 0) {
+            throw new IOException('Sending error ' . (int)$response->err);
+        }
+        $list = [];
+        foreach ($response->inbox->delivery_sms as $it) {
+            $message = new Message();
+            $message->setNumber((string)$it->number);
+            $message->setText((string)$it->message);
+            $message->setDate(\DateTime::createFromFormat('Ymd His', str_replace('T', ' ', $it->time)));
+            $list[] = $message;
+        }
+        return $list;
     }
 
     /*
