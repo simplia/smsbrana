@@ -18,12 +18,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Simplia\\ShortHash\\": "src/"
+      "Soukicz\\ShortHash\\": "src/"
     }
   },
   "autoload-dev": {
     "classmap": [
-      "tests/SimpliaTests"
+      "tests/SoukiczTests"
     ]
   }
 }

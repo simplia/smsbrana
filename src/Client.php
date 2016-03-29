@@ -1,5 +1,5 @@
 <?php
-namespace Simplia\SmsBrana;
+namespace Soukicz\SmsBrana;
 
 
 /*
