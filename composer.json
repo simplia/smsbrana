@@ -1,8 +1,8 @@
 {
-  "name": "simplia/smsbrana",
+  "name": "soukicz/smsbrana",
   "description": "SMSBrana.cz",
   "minimum-stability": "stable",
-  "license": "proprietary",
+  "license": "MIT",
   "authors": [
     {
       "name": "Petr Soukup",
