@@ -21,6 +21,9 @@ class Client {
      */
     private $queue = null; //sms ktere jsou k odeslani
 
+    /**
+     * @var \GuzzleHttp\Client
+     */
     protected $httpClient;
 
     /**
