@@ -123,7 +123,7 @@ class Client {
             'query' => array_merge($dataArray, ['delete' => $delete ? 1 : 0])
         ])->getBody()));
         if((int)$response->err > 0) {
-            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err));
+            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err), (int)$response->err);
         }
         $list = [];
         foreach ($response->inbox->delivery_sms as $it) {
@@ -161,7 +161,7 @@ class Client {
             'query' => $dataArray,
         ])->getBody()));
         if((int)$response->err > 0) {
-            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err));
+            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err), (int)$response->err);
         }
         return [
             'id' => (string)$response->sms_id,
