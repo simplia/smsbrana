@@ -153,7 +153,7 @@ class Client {
             'query' => $dataArray,
         ])->getBody()));
         if((int)$response->err > 0) {
-            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err), (int)$response->err);
+            throw new IOException('Sending error err ' . (int)$response->err . ' (' . $number . '): ' . $this->getErrorMessage((int)$response->err), (int)$response->err);
         }
         return [
             'id' => (string)$response->sms_id,
