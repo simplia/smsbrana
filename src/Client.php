@@ -10,10 +10,7 @@ namespace Soukicz\SmsBrana;
 
 
 class Client {
-    const AUTH_PLAIN = 1; //typ autentizace 1 - plain heslo (nedoporuceno)
-    const AUTH_HASH = 2; //typ autentizace 2 - prenasen pouze kontrolni hash (doporuceno)
     private $apiScript = "http://api.smsbrana.cz/smsconnect/http.php"; //link na rozhrani API
-    private $authType = 2;
     private $login = null; //uzivatelske jmeno SMSconnectu
     private $password = null; //heslo SMSconnectu
     /**
@@ -29,14 +26,16 @@ class Client {
     /**
      * Client constructor.
      * @param \GuzzleHttp\Client $client
-     * @param string $loginOrHash
+     * @param string $login
      * @param string|null $password
      */
-    function __construct(\GuzzleHttp\Client $client, $loginOrHash, $password = null) {
+    function __construct(\GuzzleHttp\Client $client, $login, $password) {
         $this->httpClient = $client;
-        $this->login = $loginOrHash;
+        $this->login = $login;
         $this->password = $password;
-        $this->authType = empty($password) ? self::AUTH_HASH : self::AUTH_PLAIN;
+        if(empty($this->login) || empty($this->password)) {
+            throw new IOException('Missing auth parameters');
+        }
         $this->create();
     }
 
@@ -72,26 +71,16 @@ class Client {
      * @return Array of login attributes | null if no login attributes are set
      */
     private function getAuthData() {
-        if($this->authType == self::AUTH_PLAIN && (empty($this->login) || empty($this->password))) {
-            throw new IOException('Missing auth parameters');
-        } elseif($this->authType == self::AUTH_HASH && empty($this->login)) {
-            throw new IOException('Missing auth parameters');
-        } else {
-            $resultArray = array();
-            if($this->authType == self::AUTH_PLAIN) {
-                $resultArray['login'] = $this->login;
-                $resultArray['password'] = $this->password;
-            } else {
-                $salt = $this->salt(10);
-                $time = date('Ymd') . 'T' . date('His');
+        $resultArray = array();
+        $salt = $this->salt(10);
+        $time = date('Ymd') . 'T' . date('His');
 
-                $resultArray['login'] = $this->login;
-                $resultArray['sul'] = $salt;
-                $resultArray['time'] = $time;
-                $resultArray['hash'] = md5($this->password . $time . $salt);
-            }
-            return $resultArray;
-        }
+        $resultArray['login'] = $this->login;
+        $resultArray['sul'] = $salt;
+        $resultArray['time'] = $time;
+        $resultArray['hash'] = md5($this->password . $time . $salt);
+
+        return $resultArray;
     }
 
     /*
