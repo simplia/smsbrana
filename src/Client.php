@@ -123,7 +123,7 @@ class Client {
             'query' => array_merge($dataArray, ['delete' => $delete ? 1 : 0])
         ])->getBody()));
         if((int)$response->err > 0) {
-            throw new IOException('Sending error ' . (int)$response->err);
+            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err));
         }
         $list = [];
         foreach ($response->inbox->delivery_sms as $it) {
@@ -161,12 +161,41 @@ class Client {
             'query' => $dataArray,
         ])->getBody()));
         if((int)$response->err > 0) {
-            throw new IOException('Sending error ' . (int)$response->err);
+            throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err));
         }
         return [
             'id' => (string)$response->sms_id,
             'count' => (int)$response->sms_count,
         ];
+    }
+
+    private function getErrorMessage($id) {
+        if($id == 1) {
+            return 'neznámá chyba';
+        } elseif($id == 2) {
+            return 'neplatný login';
+        } elseif($id == 3) {
+            return 'neplatný hash nebo password (podle varianty zabezpečení přihlášení)';
+        } elseif($id == 4) {
+            return 'neplatný time, větší odchylka času mezi servery než maximální akceptovaná v nastavení služby SMS Connect';
+        } elseif($id == 5) {
+            return 'nepovolená IP, viz nastavení služby SMS Connect';
+        } elseif($id == 6) {
+            return 'neplatný název akce';
+        } elseif($id == 7) {
+            return 'tato sul byla již jednou za daný den použita';
+        } elseif($id == 8) {
+            return 'nebylo navázáno spojení s databází';
+        } elseif($id == 9) {
+            return 'nedostatečný kredit';
+        } elseif($id == 10) {
+            return 'neplatné číslo příjemce SMS';
+        } elseif($id == 11) {
+            return 'prázdný text zprávy';
+        } elseif($id == 12) {
+            return 'SMS je delší než povolených 459 znaků';
+        }
+        return 'unknown error';
     }
 
     /*
