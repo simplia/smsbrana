@@ -116,6 +116,9 @@ class Client {
         }
         $list = [];
         foreach ($response->inbox->delivery_sms as $it) {
+            if(empty($it)) {
+                continue;
+            }
             $message = new Message();
             $message->setNumber((string)$it->number);
             $message->setText((string)$it->message);
