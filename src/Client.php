@@ -72,9 +72,11 @@ class Client {
      * @return Array of login attributes | null if no login attributes are set
      */
     private function getAuthData() {
-        if(empty($this->login) || empty($this->password))
+        if($this->authType == self::AUTH_PLAIN && (empty($this->login) || empty($this->password))) {
             throw new IOException('Missing auth parameters');
-        else {
+        } elseif($this->authType == self::AUTH_HASH && empty($this->login)) {
+            throw new IOException('Missing auth parameters');
+        } else {
             $resultArray = array();
             if($this->authType == self::AUTH_PLAIN) {
                 $resultArray['login'] = $this->login;
@@ -102,10 +104,10 @@ class Client {
     private function getAnswer($data) {
         $xmlSolid = simplexml_load_string($data);//Pokusí se vytvořit platný XML objekt se správnou strukturou
 
-        if($xmlSolid === false)//Nepodařilo se vytvořit objekt
+        if($xmlSolid === false || !$xmlSolid instanceof \SimpleXMLElement) {
             return $data;
-        else
-            return $xmlSolid->asXML();
+        }
+        return $xmlSolid->asXML();
     }
 
     /*
