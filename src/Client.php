@@ -115,7 +115,7 @@ class Client {
             throw new IOException('Sending error ' . (int)$response->err . ': ' . $this->getErrorMessage((int)$response->err), (int)$response->err);
         }
         $list = [];
-        foreach ($response->inbox->delivery_sms as $it) {
+        foreach ($response->inbox->delivery_sms->item as $it) {
             if(empty($it) || strlen(trim($it->number)) === 0) {
                 continue;
             }
