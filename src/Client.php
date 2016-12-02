@@ -116,7 +116,7 @@ class Client {
         }
         $list = [];
         foreach ($response->inbox->delivery_sms as $it) {
-            if(empty($it)) {
+            if(empty($it) || strlen(trim($it->number)) === 0) {
                 continue;
             }
             $message = new Message();
