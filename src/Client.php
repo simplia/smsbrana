@@ -10,7 +10,7 @@ namespace Soukicz\SmsBrana;
 
 
 class Client {
-    private $apiScript = "http://api.smsbrana.cz/smsconnect/http.php"; //link na rozhrani API
+    private $apiScript = "https://api.smsbrana.cz/smsconnect/http.php"; //link na rozhrani API
     private $login = null; //uzivatelske jmeno SMSconnectu
     private $password = null; //heslo SMSconnectu
     /**
